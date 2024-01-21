@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Server Control Panel</title>
+	</head>
+	<body  onload="Startup()">
+		<section id="minecraft-section">
+			<h2>Minecraft Control</h2>
+			<button id="start-minecraft" onclick="sendPost('/Start_MC')">Start Minecraft</button>
+			<button id="stop-minecraft" onclick="sendPost('/Stop_MC')">Stop Minecraft</button>
+			<div id="minecraft-status">Status: Off | Players: 0</div>
+		</section>
+
+		<section id="whole-server-section">
+			<h2>Whole Server Control</h2>
+			<button id="turn-off-server" onclick="sendShutdown()">Turn Off Server</button>
+			<button id="ping" onclick="sendPing()">Ping</button>
+			<div class="status-bar">
+				<div class="status-bar-inner" id="server-status"></div>
+			</div>
+		</section>
+	</body>
+	<script>
+		// I don't understand any of this magic tbh <3
+		async function sendShutdown() {
+			if (!confirm("Are You Sure You Want To Turn Off The Server?")) {
+				console.log("Not Turning Off");
+			} else {
+				console.log("Turning The Server Off");
+				
+				const response = await sendPost('/Shutdown')
+
+				if (!response.ok) {
+					window.alert("Server didn't shut down successfully");
+				} else {
+					location.reload();
+				};
+			}
+		}
+		async function sendPing() {
+			const response = await sendPost('/Ping');
+
+			if (response.ok) {
+				alert("Ping succesfull");
+			};
+		}
+		async function sendPost( a = '/', body = '') {
+			console.log("----POST----");
+			console.log(a);
+			const response = await fetch(server_addr + a, {
+				method: 'POST',
+				body: body,
+			});
+
+			console.log(response);
+
+			const response_json = await response.json();
+			console.log("Response_body:\r\n", JSON.stringify(response_json, undefined, 4));
+
+			if (response.ok) {
+				console.log('Post to ' + a + ' sent successfully');
+			};
+			return response;
+		}
+
+		const server_addr = window.location.protocol + "//" + window.location.host;
+		function Startup() {
+			updateEverything();
+			console.log("Connected to: ", server_addr);
+		}
+
+		// update all the statuses
+		async function updateEverything() {
+			const mc_status_response = await getUpdate('/minecraft/get_status');
+
+			const mc_status = JSON.parse(mc_status_response);
+
+			console.log(mc_status);
+
+			var mc_new_status = "Status: " + mc_status.state;
+			if (mc_status.state == "On") {
+				mc_new_status +=  ", Player count: " + mc_status.players.count;
+				if (mc_status.players.name_tags.length > 0) {
+					mc_new_status +=  ", Player nametags: " + mc_status.players.name_tags;
+				}
+			}
+
+			const minecraft_status_div = document
+				.getElementById("minecraft-status");
+			minecraft_status_div.innerHTML = mc_new_status;
+			
+		}
+		setInterval(updateEverything,5000)
+		async function getUpdate( a = '/') {
+			console.log("----GET-----");
+			console.log(a);
+
+			const response = await fetch(server_addr + a, {
+				method: 'GET',
+			});
+
+			const response_json = await response.json();
+			const response_string =  JSON.stringify(response_json, undefined, 4);
+
+			if (!response.ok) {
+				console.log('Update to ' + a + 'not succesfull');
+			};
+			return response_string;
+		}
+	</script>
+	<style>
+		body {
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			background-color: #f2f2f2;
+			margin: 0;
+			padding: 0;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 100vh;
+		}
+
+		section {
+			background-color: #fff;
+			border-radius: 8px;
+			padding: 20px;
+			margin: 20px;
+			box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+			text-align: center;
+		}
+
+		h2 {
+			color: #333;
+		}
+
+		button {
+			padding: 10px;
+			font-size: 16px;
+			margin: 5px;
+			cursor: pointer;
+			border: none;
+			border-radius: 5px;
+			transition: background-color 0.3s ease;
+		}
+
+		button:hover {
+			background-color: #4CAF50;
+			color: #fff;
+		}
+
+		#minecraft-status {
+			font-size: 14px;
+			margin-top: 10px;
+			color: #888;
+		}
+
+		.status-bar {
+			height: 20px;
+			border: 1px solid #ccc;
+			margin-top: 10px;
+			position: relative;
+			background-color: #eee;
+			border-radius: 5px;
+		}
+
+		.status-bar-inner {
+			height: 100%;
+			width: 0;
+			background-color: #4CAF50;
+			border-radius: 5px;
+		}
+	</style>
+</html>
