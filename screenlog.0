@@ -1,3 +1,0 @@
-thread 'main' panicked at src/main.rs:22:59:
-Failed to Parse the Config file: Error("expected value", line: 1, column: 1)
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

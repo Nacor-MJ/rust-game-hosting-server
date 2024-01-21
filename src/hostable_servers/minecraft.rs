@@ -8,9 +8,15 @@ pub struct MinecraftServer {
     state: State,
     players: Players,
 }
+impl Default for MinecraftServer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl MinecraftServer {
-    pub fn new() -> Self {
-        MinecraftServer {
+    #[must_use] pub fn new() -> Self {
+        Self {
             state: State::Off,
             players: Players {
                 count: 0,
@@ -26,16 +32,14 @@ impl MinecraftServer {
         };
     }
     fn get_players(&mut self) -> Result<(), CommandFailure> {
-        exec_parse_command("sh ./Minecraft/mc_status.sh")?;
+        exec_parse_command("sh ./Minecraft/status.sh")?;
 
         let output = std::fs::read_to_string("Minecraft/screenlog.0")
-            .unwrap_or(String::from("Couldn't read the log file"));
+            .unwrap_or_else(|e| {eprintln!("\x1b[31mCouldn't read the Minecraft log file: {e}\x1b[39m"); String::new()});
 
         let last_line = output.lines().last().unwrap_or("Couldn't parse the log");
 
         let index_of_players = last_line.find(" of a max of ");
-
-        dbg!(&last_line);
 
         if index_of_players.is_none() {
             self.state = State::Standby;
@@ -44,7 +48,7 @@ impl MinecraftServer {
         let index_of_players = index_of_players.unwrap();
 
         let slice = &last_line[index_of_players - 2..index_of_players];
-        println!("{}", slice);
+        println!("{slice}");
         match slice.to_string().trim().parse::<usize>() {
             Ok(ok) => self.players.count = ok,
             Err(e) => println!("Error with parsing the number of players: \r\n{e}"),
@@ -58,22 +62,9 @@ impl MinecraftServer {
     }
 }
 
-#[derive(Serialize)]
-enum State {
-    On,
-    Off,
-    Standby,
-}
-
-#[derive(Serialize)]
-struct Players {
-    count: usize,
-    name_tags: Vec<String>,
-}
-
 impl HostableServer for MinecraftServer {
     fn start(&mut self) -> Result<(), CommandFailure> {
-        let state = exec_parse_command("sh ./Minecraft/mc_start.sh");
+        let state = exec_parse_command("sh ./Minecraft/start.sh");
 
         if state.is_ok() {
             self.state = State::Standby;
@@ -83,7 +74,7 @@ impl HostableServer for MinecraftServer {
     }
 
     fn stop(&mut self) -> Result<(), CommandFailure> {
-        let state = exec_parse_command("sh ./Minecraft/mc_stop.sh");
+        let state = exec_parse_command("sh ./Minecraft/stop.sh");
 
         if state.is_ok() {
             self.state = State::Standby;
@@ -110,4 +101,17 @@ impl HostableServer for MinecraftServer {
     fn to_json(&self) -> Result<String, serde_json::Error> {
         serde_json::to_string(&self)
     }
+}
+
+#[derive(Serialize)]
+enum State {
+    On,
+    Off,
+    Standby,
+}
+
+#[derive(Serialize)]
+struct Players {
+    count: usize,
+    name_tags: Vec<String>,
 }

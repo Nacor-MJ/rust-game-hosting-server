@@ -5,11 +5,13 @@ pub struct Message {
     pub content: Content,
 }
 impl Message {
+    #[must_use]
     pub fn new(variant: Variant, content: Content) -> Self {
         Self { variant, content }
     }
+    #[must_use]
     pub fn internal_server_error(e: String) -> Self {
-        Message::new(Variant::InternalServerError, Content::Text(e))
+        Self::new(Variant::InternalServerError, Content::Text(e))
     }
 }
 impl Default for Message {
@@ -23,7 +25,7 @@ impl Default for Message {
 impl std::string::ToString for Message {
     fn to_string(&self) -> String {
         // status line
-        let mut response = match self.variant {
+        let mut message = match self.variant {
             Variant::Ok => "HTTP/1.1 200 OK\r\n",
             Variant::ServiceUnavailable => "HTTP/1.1 503 Service Unavailable\r\n",
             Variant::NotFound => "HTTP/1.1 404 NOT FOUND\r\n",
@@ -32,20 +34,20 @@ impl std::string::ToString for Message {
         .to_owned();
 
         // header
-        response += match self.content {
-            Content::Struct(_) => "\r\n", // Content-Type: application/json
+        message += match self.content {
+            Content::Text(_) => "Content-Type: text/plain\r\n",
             _ => "\r\n",
         };
 
         // response
-        response += self.content.to_string().as_str();
+        message += self.content.to_string().as_str();
 
         // finished
-        response
+        message
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Variant {
     Ok,                  // "HTTP/1.1 200 OK\r\n\r\n"
     ServiceUnavailable,  // "HTTP/1.1 503 Service Unavailable\r\n\r\n"
@@ -68,19 +70,13 @@ impl std::string::ToString for Content {
     /// then displaying
     fn to_string(&self) -> String {
         match self {
-            Content::File(filename) => {
-                let file_content = match std::fs::read_to_string(filename) {
-                    Ok(ok) => ok,
-                    Err(e) => {
-                        return Message::new(Variant::NotFound, Content::Text(e.to_string()))
-                            .to_string()
-                    }
-                };
-                file_content
-            }
-            Content::Text(txt) | Content::Struct(txt) => txt.clone(),
-            Content::Empty => String::new(),
-            Content::RawBytes(_) => String::from("RawBytes is not meant to be displayed ᓚᘏᗢ"),
+            Self::File(filename) => match std::fs::read_to_string(filename) {
+                Ok(ok) => ok,
+                Err(e) => Message::new(Variant::NotFound, Self::Text(e.to_string())).to_string(),
+            },
+            Self::Text(txt) | Self::Struct(txt) => txt.clone(),
+            Self::Empty => String::new(),
+            Self::RawBytes(_) => String::from("RawBytes is not meant to be displayed ᓚᘏᗢ"),
         }
     }
 }

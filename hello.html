@@ -8,9 +8,9 @@
 	<body  onload="Startup()">
 		<section id="minecraft-section">
 			<h2>Minecraft Control</h2>
-			<button id="start-minecraft" onclick="sendPost('/Start_MC')">Start Minecraft</button>
-			<button id="stop-minecraft" onclick="sendPost('/Stop_MC')">Stop Minecraft</button>
-			<div id="minecraft-status">Status: Off | Players: 0</div>
+			<button id="start-minecraft" onclick="sendPost('/minecraft/start')">Start Minecraft</button>
+			<button id="stop-minecraft" onclick="sendPost('/minecraft/stop')">Stop Minecraft</button>
+			<div id="minecraft-status">Status: Off</div>
 		</section>
 
 		<section id="whole-server-section">
@@ -47,21 +47,26 @@
 			};
 		}
 		async function sendPost( a = '/', body = '') {
-			console.log("----POST----");
-			console.log(a);
+			console.log("POST: " + a);
+
 			const response = await fetch(server_addr + a, {
 				method: 'POST',
 				body: body,
 			});
 
-			console.log(response);
-
-			const response_json = await response.json();
-			console.log("Response_body:\r\n", JSON.stringify(response_json, undefined, 4));
-
 			if (response.ok) {
 				console.log('Post to ' + a + ' sent successfully');
-			};
+			}
+
+			const response_clone = response.clone();
+
+			try {
+				const response_json = await response.json();
+				console.log("Response_body: ", JSON.stringify(response_json, undefined, 4));
+			} catch {
+				console.log("Response_body: " + await response_clone.text());
+			}
+
 			return response;
 		}
 
@@ -71,6 +76,7 @@
 			console.log("Connected to: ", server_addr);
 		}
 
+		setInterval(updateEverything,5000)
 		// update all the statuses
 		async function updateEverything() {
 			const mc_status_response = await getUpdate('/minecraft/get_status');
@@ -92,14 +98,18 @@
 			minecraft_status_div.innerHTML = mc_new_status;
 			
 		}
-		setInterval(updateEverything,5000)
 		async function getUpdate( a = '/') {
-			console.log("----GET-----");
-			console.log(a);
+			console.log("GET: " + a );
 
-			const response = await fetch(server_addr + a, {
-				method: 'GET',
-			});
+			var response;
+
+			try {
+				response = await fetch(server_addr + a, {
+					method: 'GET',
+				});
+			} catch (error) {
+				location.reload();
+			}
 
 			const response_json = await response.json();
 			const response_string =  JSON.stringify(response_json, undefined, 4);
