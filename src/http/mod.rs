@@ -6,11 +6,11 @@ pub struct Message {
 }
 impl Message {
     #[must_use]
-    pub fn new(variant: Variant, content: Content) -> Self {
+    pub const fn new(variant: Variant, content: Content) -> Self {
         Self { variant, content }
     }
     #[must_use]
-    pub fn internal_server_error(e: String) -> Self {
+    pub const  fn internal_server_error(e: String) -> Self {
         Self::new(Variant::InternalServerError, Content::Text(e))
     }
 }
@@ -47,7 +47,7 @@ impl std::string::ToString for Message {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum Variant {
     Ok,                  // "HTTP/1.1 200 OK\r\n\r\n"
     ServiceUnavailable,  // "HTTP/1.1 503 Service Unavailable\r\n\r\n"

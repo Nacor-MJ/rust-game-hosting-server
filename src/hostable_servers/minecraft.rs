@@ -4,18 +4,18 @@ use crate::hostable_servers::{
 use serde::Serialize;
 
 #[derive(Serialize)]
-pub struct MinecraftServer {
+pub struct ServerInfo {
     state: State,
     players: Players,
 }
-impl Default for MinecraftServer {
+impl Default for ServerInfo {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl MinecraftServer {
-    #[must_use] pub fn new() -> Self {
+impl ServerInfo {
+    #[must_use] pub const fn new() -> Self {
         Self {
             state: State::Off,
             players: Players {
@@ -45,6 +45,7 @@ impl MinecraftServer {
             self.state = State::Standby;
             return Ok(());
         }
+        #[allow(clippy::unwrap_used)]
         let index_of_players = index_of_players.unwrap();
 
         let slice = &last_line[index_of_players - 2..index_of_players];
@@ -62,7 +63,7 @@ impl MinecraftServer {
     }
 }
 
-impl HostableServer for MinecraftServer {
+impl HostableServer for ServerInfo {
     fn start(&mut self) -> Result<(), CommandFailure> {
         let state = exec_parse_command("sh ./Minecraft/start.sh");
 

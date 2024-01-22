@@ -7,18 +7,33 @@ pub mod minecraft;
 /// Describes a generic server that can be hosted
 pub trait HostableServer {
     /// Starts the Server
+    /// # Errors
+    /// Errors if the start.sh doesn't work. 
+    /// Could be from not having enough priviliges.
     fn start(&mut self) -> Result<(), CommandFailure>;
     /// Stops the Server gracefully
+    /// # Errors
+    /// Errors if the stop.sh doesn't work. 
+    /// Could be from not having enough priviliges.
     fn stop(&mut self) -> Result<(), CommandFailure>;
     /// Restart
+    /// # Errors
+    /// Errors if the stop.sh or start.sh doesn't work. 
+    /// Could be from not having enough priviliges.
     fn restart(&mut self) -> Result<(), CommandFailure> {
         Self::stop(self)?;
         Self::start(self)
     }
     /// Updates the Hostable Server Object
     /// The update to the client will be sent later
+    /// # Errors
+    /// Errors if the status.sh doesn't work. 
+    /// Could be from not having enough priviliges.
     fn update_status(&mut self) -> Result<(), CommandFailure>;
     /// Returns a representation of self as a Json object, the object shouldn't be nested
+    /// # Errors 
+    /// Serialization can fail if Self's implementation of Serialize decides to fail, 
+    /// or if Self contains a map with non-string keys.
     fn to_json(&self) -> Result<String, serde_json::Error>;
 }
 
