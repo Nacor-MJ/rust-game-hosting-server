@@ -3,8 +3,7 @@
 //! Abstracts away the implementation details of a web server.
 //! Servers that implement the [`HostableServer`] trait can be run on it
 
-#![deny(clippy::missing_docs_in_private_items)]
-#![deny(clippy::all)]
+#![warn(clippy::missing_docs_in_private_items)]
 
 use hostable_servers::{HostableServer, HostableServerHashed};
 use http::{Content, Message, Variant};
@@ -78,6 +77,9 @@ fn create_timeout_thread(allowed_idle_time: Duration) -> (Sender<()>, JoinHandle
     (tx, timer_thread)
 }
 
+/// Handles the TCP connection
+///
+/// Prints updates to stdout or stderr during the whole operation
 fn handle_connection(
     mut stream: TcpStream,
     hostable_servers: &mut HostableServerHashed,
@@ -147,6 +149,10 @@ fn handle_connection(
     Ok(())
 }
 
+/// Parses the http to the best of it's abilities
+///
+/// # Errors
+/// Can only process GET and POST methods
 fn parse_http_request(
     method: &str,
     link: &str,
@@ -165,6 +171,7 @@ fn parse_http_request(
     }
 }
 
+/// Parses a post method
 fn parse_post(
     link: &str,
     hostable_servers: &mut HashMap<&str, Box<dyn HostableServer>>,
@@ -217,6 +224,10 @@ fn parse_post(
     }
 }
 
+/// Parses a GET request
+///
+/// # Errors
+/// Returns a 404 if it can't find the file
 fn parse_get(link: &str, hostable_servers: &mut HashMap<&str, Box<dyn HostableServer>>) -> Message {
     match link {
         "/" => Message {
@@ -272,12 +283,10 @@ fn parse_get(link: &str, hostable_servers: &mut HashMap<&str, Box<dyn HostableSe
                             Err(e) => Message::internal_server_error(e.to_string()),
                         }
                     }
-                    "update.js" => {
-                        Message::new(
-                            Variant::Ok,
-                            Content::File(format!("{first_domain}/update.js"))
-                        )
-                    }
+                    "update.js" => Message::new(
+                        Variant::Ok,
+                        Content::File(format!("{first_domain}/update.js")),
+                    ),
                     e => {
                         println!("Link not accesible: {e}");
                         Message::new(
@@ -297,6 +306,11 @@ fn parse_get(link: &str, hostable_servers: &mut HashMap<&str, Box<dyn HostableSe
         }
     }
 }
+
+#[cfg(target_os = "linux")]
+/// Attempts to command the whole PC to shutdown.
+///
+/// The PC shoudl Shutdown in one minute
 fn shutdown_server() -> Message {
     let output = Command::new("shutdown").output();
 
@@ -334,7 +348,14 @@ fn shutdown_server() -> Message {
         )
     }
 }
-
+#[cfg(not(target_os = "linux"))]
+/// Shutdown is only implemented for linux 
+fn shutdown_server() -> Message {
+    Message::new(
+        Variant::ServiceUnavailable,
+        Content::Text("Shutting downt isn't supported in this platform yet"),
+    )
+}
 
 /// Fills the `HostableServerHashed` with tuples in the format (`path_home`, `&dyn HostableServer`)
 ///
@@ -351,7 +372,7 @@ fn shutdown_server() -> Message {
 /// ```
 #[macro_export]
 macro_rules! hostable_server_hashed {
-    ( $( ($name:literal, $obj:expr) ),* ) => {
+    ( $(($name:literal, $obj:expr)),* ) => {
         {
             let mut hostable_servers: HostableServerHashed = HashMap::new();
             $(

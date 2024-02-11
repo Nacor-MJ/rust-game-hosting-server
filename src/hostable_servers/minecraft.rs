@@ -37,6 +37,10 @@ impl Server {
             name_tags: Vec::new(),
         };
     }
+    /// Updates self
+    /// 
+    /// # Errors
+    /// Returns a [`CommandFailure`] if the program doesn't have the right privilages 
     fn update_players(&mut self) -> Result<(), CommandFailure> {
         exec_parse_command("sh ./Minecraft/status.sh")?;
 
@@ -53,7 +57,7 @@ impl Server {
             self.state = State::Standby;
             return Ok(());
         }
-        #[allow(clippy::unwrap_used)]
+        #[allow(clippy::unwrap_used)] // This is fine because of the if statement above
         let index_of_players = index_of_players.unwrap();
 
         let slice = &last_line[index_of_players - 2..index_of_players];
