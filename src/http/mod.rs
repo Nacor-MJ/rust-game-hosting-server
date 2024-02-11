@@ -48,14 +48,14 @@ impl std::string::ToString for Message {
         };
 
         // response
-        return match self.content.to_string() {
+        match self.content.to_string() {
             Ok(ok) => {
                 message + &ok
             },
             Err(e) => {
-                format!("HTTP/1.1 404 NOT FOUND \r\n Content-Type: text/plain\r\n {}", e)
+                format!("HTTP/1.1 404 NOT FOUND \r\n Content-Type: text/plain\r\n {e}")
             },
-        };
+        }
     }
 }
 

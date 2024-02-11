@@ -3,6 +3,9 @@
 //! Abstracts away the implementation details of a web server.
 //! Servers that implement the [`HostableServer`] trait can be run on it
 
+#![deny(clippy::missing_docs_in_private_items)]
+#![warn(clippy::all)]
+
 use hostable_servers::{HostableServer, HostableServerHashed};
 use http::{Content, Message, Variant};
 use std::{
@@ -27,7 +30,7 @@ pub mod http;
 /// Panics if the `port` and `ip` adress provided are already in use or are otherwise blocked
 pub fn start(ip: &str, port: usize, hostable_servers: &mut HostableServerHashed) {
     // Ip adress setup
-    let ip_and_port = format!("{}:{}", ip, port);
+    let ip_and_port = format!("{ip}:{port}");
 
     println!("Http://{ip_and_port}/");
 
@@ -228,7 +231,7 @@ fn parse_get(link: &str, hostable_servers: &mut HashMap<&str, Box<dyn HostableSe
             let servers: Vec<&str> = hostable_servers.iter().map(|s| s.0.to_owned()).collect();
             Message {
                 variant: Variant::Ok,
-                content: Content::Struct(serde_json::to_string(&servers).unwrap_or("".to_owned())),
+                content: Content::Struct(serde_json::to_string(&servers).unwrap_or_default()),
             }
         }
         link => {
@@ -272,7 +275,7 @@ fn parse_get(link: &str, hostable_servers: &mut HashMap<&str, Box<dyn HostableSe
                     "update.js" => {
                         Message::new(
                             Variant::Ok,
-                            Content::File(format!("{}/update.js", first_domain))
+                            Content::File(format!("{first_domain}/update.js"))
                         )
                     }
                     e => {
@@ -333,7 +336,7 @@ fn shutdown_server() -> Message {
 }
 
 
-/// Fills the HostableServerHashed with tuples in the format (`path_home`, `&dyn HostableServer`)
+/// Fills the `HostableServerHashed` with tuples in the format (`path_home`, `&dyn HostableServer`)
 ///
 /// # Examples
 ///

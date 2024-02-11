@@ -9,8 +9,8 @@ pub mod minecraft;
 /// Represents a server that can be hosted
 /// 
 /// # Errors
-/// Doesn't work if there isn't an update.js file in path_home.
-/// This file should have update_{path_home} function which is called periodically 
+/// Doesn't work if there isn't an update.js file in `path_home`.
+/// This file should have update_{`path_home`} function which is called periodically 
 /// to update the state in the website
 pub trait HostableServer {
     /// Starts the Server
