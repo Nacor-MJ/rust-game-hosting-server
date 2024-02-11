@@ -4,7 +4,7 @@
 //! Servers that implement the [`HostableServer`] trait can be run on it
 
 #![deny(clippy::missing_docs_in_private_items)]
-#![warn(clippy::all)]
+#![deny(clippy::all)]
 
 use hostable_servers::{HostableServer, HostableServerHashed};
 use http::{Content, Message, Variant};
