@@ -1,21 +1,26 @@
+//! Implements [`crate::hostable_servers::HostableServer`] for minecraft
+
 use crate::hostable_servers::{
     exec_parse_command, get_screen_sessions, CommandFailure, HostableServer,
 };
 use serde::Serialize;
 
+/// Minecraft Server with the State and number of Players
 #[derive(Serialize)]
-pub struct ServerInfo {
+pub struct Server {
     state: State,
     players: Players,
 }
-impl Default for ServerInfo {
+impl Default for Server {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl ServerInfo {
-    #[must_use] pub const fn new() -> Self {
+impl Server {
+    /// Creates a new turned off minecraft server
+    #[must_use]
+    pub const fn new() -> Self {
         Self {
             state: State::Off,
             players: Players {
@@ -24,6 +29,7 @@ impl ServerInfo {
             },
         }
     }
+    /// Sets `self` to default
     fn set_default(&mut self) {
         self.state = State::Off;
         self.players = Players {
@@ -31,11 +37,13 @@ impl ServerInfo {
             name_tags: Vec::new(),
         };
     }
-    fn get_players(&mut self) -> Result<(), CommandFailure> {
+    fn update_players(&mut self) -> Result<(), CommandFailure> {
         exec_parse_command("sh ./Minecraft/status.sh")?;
 
-        let output = std::fs::read_to_string("Minecraft/screenlog.0")
-            .unwrap_or_else(|e| {eprintln!("\x1b[31mCouldn't read the Minecraft log file: {e}\x1b[39m"); String::new()});
+        let output = std::fs::read_to_string("Minecraft/screenlog.0").unwrap_or_else(|e| {
+            eprintln!("\x1b[31mCouldn't read the Minecraft log file: {e}\x1b[39m");
+            String::new()
+        });
 
         let last_line = output.lines().last().unwrap_or("Couldn't parse the log");
 
@@ -63,7 +71,7 @@ impl ServerInfo {
     }
 }
 
-impl HostableServer for ServerInfo {
+impl HostableServer for Server {
     fn start(&mut self) -> Result<(), CommandFailure> {
         let state = exec_parse_command("sh ./Minecraft/start.sh");
 
@@ -91,7 +99,7 @@ impl HostableServer for ServerInfo {
         let sessions = get_screen_sessions();
 
         if sessions.contains(".minecraft_server\t") {
-            self.get_players()?;
+            self.update_players()?;
         } else {
             self.set_default();
         }

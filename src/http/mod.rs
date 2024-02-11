@@ -1,14 +1,22 @@
+//! Describes all the fun stuff that has something to do with HTTP requests
+
+use std::io;
+
 /// Message meant to be sent over Http
 #[derive(Debug)]
 pub struct Message {
+    /// Describes the HTTP response variant
     pub variant: Variant,
+    /// Represents possible contents of an HTTP response
     pub content: Content,
 }
 impl Message {
+    /// Returns a new Message
     #[must_use]
     pub const fn new(variant: Variant, content: Content) -> Self {
         Self { variant, content }
     }
+    /// A 500 internal server error with the text content of `e` 
     #[must_use]
     pub const  fn internal_server_error(e: String) -> Self {
         Self::new(Variant::InternalServerError, Content::Text(e))
@@ -40,43 +48,55 @@ impl std::string::ToString for Message {
         };
 
         // response
-        message += self.content.to_string().as_str();
-
-        // finished
-        message
+        return match self.content.to_string() {
+            Ok(ok) => {
+                message + &ok
+            },
+            Err(e) => {
+                format!("HTTP/1.1 404 NOT FOUND \r\n Content-Type: text/plain\r\n {}", e)
+            },
+        };
     }
 }
 
+
+/// Describes the HTTP response variant
 #[derive(Debug, PartialEq, Eq)]
 pub enum Variant {
-    Ok,                  // "HTTP/1.1 200 OK\r\n\r\n"
-    ServiceUnavailable,  // "HTTP/1.1 503 Service Unavailable\r\n\r\n"
-    NotFound,            // "HTTP/1.1 404 Not Found\r\n\r\n"
-    InternalServerError, // "HTTP/1.1 500 Internal Server Error\r\n\r\n"
+    /// 200 OK
+    Ok,                  
+    /// 503 Service Unavailable
+    ServiceUnavailable,  
+    /// 404 Not Found
+    NotFound,            
+    /// 500 Internal Server Error
+    InternalServerError, 
 }
 
 /// Represents possible contents of an HTTP response
 #[derive(Debug)]
 pub enum Content {
+    /// File to be read using [`std::fs::read_to_string()`]
     File(String),
+    /// Generic text
     Text(String),
+    /// Struct already parsed into json
     Struct(String),
+    /// RawBytes, used to transfer file such as the favicon.ico
     RawBytes(Box<[u8]>),
+    /// Notgin
     Empty,
 }
 
-impl std::string::ToString for Content {
+impl Content {
     /// This Should Not Be Used for `HttpContent::RawBytes` with any other purpose  
     /// then displaying
-    fn to_string(&self) -> String {
+    fn to_string(&self) -> io::Result<String> {
         match self {
-            Self::File(filename) => match std::fs::read_to_string(filename) {
-                Ok(ok) => ok,
-                Err(e) => Message::new(Variant::NotFound, Self::Text(e.to_string())).to_string(),
-            },
-            Self::Text(txt) | Self::Struct(txt) => txt.clone(),
-            Self::Empty => String::new(),
-            Self::RawBytes(_) => String::from("RawBytes is not meant to be displayed ᓚᘏᗢ"),
+            Self::File(filename) => std::fs::read_to_string(filename),
+            Self::Text(txt) | Self::Struct(txt) => Ok(txt.clone()),
+            Self::Empty => Ok(String::new()),
+            Self::RawBytes(_) => Ok(String::from("RawBytes is not meant to be displayed ᓚᘏᗢ")),
         }
     }
 }

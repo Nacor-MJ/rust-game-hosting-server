@@ -6,13 +6,6 @@
 		<title>Server Control Panel</title>
 	</head>
 	<body  onload="Startup()">
-		<section id="minecraft-section">
-			<h2>Minecraft Control</h2>
-			<button id="start-minecraft" onclick="sendPost('/minecraft/start')">Start Minecraft</button>
-			<button id="stop-minecraft" onclick="sendPost('/minecraft/stop')">Stop Minecraft</button>
-			<div id="minecraft-status">Status: Off</div>
-		</section>
-
 		<section id="whole-server-section">
 			<h2>Whole Server Control</h2>
 			<button id="turn-off-server" onclick="sendShutdown()">Turn Off Server</button>
@@ -23,6 +16,19 @@
 		</section>
 	</body>
 	<script>
+		const server_addr = window.location.protocol + "//" + window.location.host;
+		async function Startup() {
+			console.log("Connected to: ", server_addr);
+
+			setInterval(updateEverything, 5000);
+
+			await get_available_servers();
+			
+			// There honestly isn't much use for this
+			// I just want to have a pretty http response as the last one in the stdout :)
+			await updateEverything();
+		}
+
 		// I don't understand any of this magic tbh <3
 		async function sendShutdown() {
 			if (!confirm("Are You Sure You Want To Turn Off The Server?")) {
@@ -69,35 +75,41 @@
 
 			return response;
 		}
-
-		const server_addr = window.location.protocol + "//" + window.location.host;
-		function Startup() {
-			updateEverything();
-			console.log("Connected to: ", server_addr);
-		}
-
-		setInterval(updateEverything,5000)
+		
 		// update all the statuses
+		var available_server = [];
 		async function updateEverything() {
-			const mc_status_response = await getUpdate('/minecraft/get_status');
-
-			const mc_status = JSON.parse(mc_status_response);
-
-			console.log(mc_status);
-
-			var mc_new_status = "Status: " + mc_status.state;
-			if (mc_status.state == "On") {
-				mc_new_status +=  ", Player count: " + mc_status.players.count;
-				if (mc_status.players.name_tags.length > 0) {
-					mc_new_status +=  ", Player nametags: " + mc_status.players.name_tags;
-				}
-			}
-
-			const minecraft_status_div = document
-				.getElementById("minecraft-status");
-			minecraft_status_div.innerHTML = mc_new_status;
-			
+			await update_available_servers();
 		}
+
+		async function get_available_servers() {
+			var response = await getUpdate('/available-servers');
+			response = JSON.parse(response);
+
+			console.log(response);
+
+			available_server = response;
+
+			for (i=0; i<available_server.length; i++) {
+				var script = document.createElement("script"); 
+				
+				script.src = "/" + available_server[i] + "/update.js";  
+			
+				document.head.appendChild(script);  
+			}
+		}
+
+		async function update_available_servers() {
+			for (i=0; i<available_server.length; i++) {
+				var fn = window["update_" + available_server[i]];
+				if (typeof fn == 'function') {
+					fn()
+				} else {
+					console.error("update_" + available_server[i] + " isn't implemented");
+				};
+			}
+		}
+
 		async function getUpdate( a = '/') {
 			console.log("GET: " + a );
 

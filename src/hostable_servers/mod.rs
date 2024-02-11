@@ -1,10 +1,17 @@
+//! Creates an interface for servers that are supposed to be hosted <3
+
 use std::collections::HashMap;
 use std::process::Command;
 use std::fmt;
 
 pub mod minecraft;
 
-/// Describes a generic server that can be hosted
+/// Represents a server that can be hosted
+/// 
+/// # Errors
+/// Doesn't work if there isn't an update.js file in path_home.
+/// This file should have update_{path_home} function which is called periodically 
+/// to update the state in the website
 pub trait HostableServer {
     /// Starts the Server
     /// # Errors
@@ -12,6 +19,9 @@ pub trait HostableServer {
     /// Could be from not having enough priviliges.
     fn start(&mut self) -> Result<(), CommandFailure>;
     /// Stops the Server gracefully
+    /// 
+    /// The function should not return until the server is stopped due to
+    /// the default [`HostableServer::restart`] implementation
     /// # Errors
     /// Errors if the stop.sh doesn't work. 
     /// Could be from not having enough priviliges.
@@ -37,9 +47,14 @@ pub trait HostableServer {
     fn to_json(&self) -> Result<String, serde_json::Error>;
 }
 
-pub type HostableServerHashed<'a> = HashMap<&'static str, &'a mut dyn HostableServer>;
 
-/// Failure of a `HostableServer` command
+/// Hasmap of all the hostable servers
+/// 
+/// The key is the name by which the server will be accesed through the web interface.
+/// The Value needs to implement the  [`HostableServer`] trait
+pub type HostableServerHashed<'a> = HashMap<&'static str,  Box<dyn HostableServer>>;
+
+/// Failure of a [`HostableServer`] command
 pub struct CommandFailure(String);
 // Implement std::fmt::Display for CommandFailure
 impl fmt::Display for CommandFailure {
@@ -56,7 +71,7 @@ impl fmt::Debug for CommandFailure {
 
 // Generic Helper Functions <3
 
-/// Executes the `command` and parses the error into `CommandFailure`.
+/// Executes the `command` and possibly parses the error into [`CommandFailure`].
 /// `command` is formated as it would be to the shell, arguments seperated by a space
 fn exec_parse_command(command: &str) -> Result<(), CommandFailure> {
     let mut command_split = command.split(' ');

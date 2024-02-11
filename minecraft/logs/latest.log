@@ -1,0 +1,31 @@
+[07:57:23] [ServerMain/INFO]: Environment: Environment[sessionHost=https://sessionserver.mojang.com, servicesHost=https://api.minecraftservices.com, name=PROD]
+[07:57:26] [ServerMain/INFO]: Loaded 7 recipes
+[07:57:26] [ServerMain/INFO]: Loaded 1271 advancements
+[07:57:26] [Server thread/INFO]: Starting minecraft server version 1.20.4
+[07:57:26] [Server thread/INFO]: Loading properties
+[07:57:26] [Server thread/INFO]: Default game type: SURVIVAL
+[07:57:26] [Server thread/INFO]: Generating keypair
+[07:57:27] [Server thread/INFO]: Starting Minecraft server on *:25565
+[07:57:27] [Server thread/INFO]: Using epoll channel type
+[07:57:27] [Server thread/WARN]: **** SERVER IS RUNNING IN OFFLINE/INSECURE MODE!
+[07:57:27] [Server thread/WARN]: The server will make no attempt to authenticate usernames. Beware.
+[07:57:27] [Server thread/WARN]: While this makes the game possible to play without internet access, it also opens up the ability for hackers to connect with any username they choose.
+[07:57:27] [Server thread/WARN]: To change this, set "online-mode" to "true" in the server.properties file.
+[07:57:27] [Server thread/INFO]: Preparing level "Matousuv Bengr Svet"
+[07:57:34] [Server thread/INFO]: Preparing start region for dimension minecraft:overworld
+[07:57:39] [Worker-Main-1/INFO]: Preparing spawn area: 0%
+[07:57:39] [Worker-Main-1/INFO]: Preparing spawn area: 0%
+[07:57:39] [Worker-Main-1/INFO]: Preparing spawn area: 0%
+[07:57:39] [Worker-Main-1/INFO]: Preparing spawn area: 0%
+[07:57:39] [Worker-Main-1/INFO]: Preparing spawn area: 0%
+[07:57:39] [Worker-Main-1/INFO]: Preparing spawn area: 0%
+[07:57:39] [Worker-Main-1/INFO]: Preparing spawn area: 0%
+[07:57:39] [Worker-Main-1/INFO]: Preparing spawn area: 0%
+[07:57:39] [Worker-Main-1/INFO]: Preparing spawn area: 0%
+[07:57:39] [Worker-Main-1/INFO]: Preparing spawn area: 0%
+[07:57:39] [Worker-Main-1/INFO]: Preparing spawn area: 0%
+[07:57:40] [Worker-Main-1/INFO]: Preparing spawn area: 0%
+[07:57:40] [Worker-Main-1/INFO]: Preparing spawn area: 0%
+[07:57:41] [Worker-Main-1/INFO]: Preparing spawn area: 15%
+[07:57:41] [Server thread/INFO]: Time elapsed: 6691 ms
+[07:57:41] [Server thread/INFO]: Done (13.296s)! For help, type "help"
