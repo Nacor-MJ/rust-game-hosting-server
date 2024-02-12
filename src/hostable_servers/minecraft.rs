@@ -8,7 +8,9 @@ use serde::Serialize;
 /// Minecraft Server with the State and number of Players
 #[derive(Serialize)]
 pub struct Server {
+    /// State of the Server {On/Off/Unknown}
     state: State,
+    /// Number of players and their nametags
     players: Players,
 }
 impl Default for Server {
@@ -54,7 +56,7 @@ impl Server {
         let index_of_players = last_line.find(" of a max of ");
 
         if index_of_players.is_none() {
-            self.state = State::Standby;
+            self.state = State::Unknown;
             return Ok(());
         }
         #[allow(clippy::unwrap_used)] // This is fine because of the if statement above
@@ -80,7 +82,7 @@ impl HostableServer for Server {
         let state = exec_parse_command("sh ./Minecraft/start.sh");
 
         if state.is_ok() {
-            self.state = State::Standby;
+            self.state = State::Unknown;
         };
 
         state
@@ -90,7 +92,7 @@ impl HostableServer for Server {
         let state = exec_parse_command("sh ./Minecraft/stop.sh");
 
         if state.is_ok() {
-            self.state = State::Standby;
+            self.state = State::Unknown;
         };
 
         state
@@ -116,15 +118,22 @@ impl HostableServer for Server {
     }
 }
 
+/// Status of a minecraft server
 #[derive(Serialize)]
 enum State {
+    /// Turned On
     On,
+    /// Turned Off
     Off,
-    Standby,
+    /// Unknown
+    Unknown,
 }
 
+/// Number of players logged into the Server and their nametags
 #[derive(Serialize)]
 struct Players {
+    /// Num of players
     count: usize,
+    /// Players nametags
     name_tags: Vec<String>,
 }
