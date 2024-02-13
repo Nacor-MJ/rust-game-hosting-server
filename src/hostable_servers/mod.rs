@@ -70,8 +70,9 @@ impl fmt::Debug for CommandFailure {
 // Generic Helper Functions <3
 
 /// Executes the `command` and possibly parses the error into [`CommandFailure`].
-/// `command` is formated as it would be to the shell, arguments seperated by a space
-fn exec_parse_command(command: &str) -> Result<(), CommandFailure> {
+/// 
+/// `command` is formated as it would be when passed into the shell, arguments seperated by a space
+fn exec_and_parse_command(command: &str) -> Result<(), CommandFailure> {
     let mut command_split = command.split(' ');
     let program: &str = command_split.next().expect("Invalid Command");
     let arguments: Vec<&str> = command_split.collect();
@@ -131,5 +132,71 @@ impl Players {
             count: 0,
             name_tags: Vec::new(),
         }
+    }
+}
+
+/// Basic implementation for the [`HostableServer`] Trait.
+/// 
+/// The Server is contolled by start.sh and stop.sh scripts that are located in path.
+/// 
+/// For now the bash scripts are responsible for creating a screen session with the name {path}_server
+#[derive(serde::Serialize)]
+pub struct GeneralBashServer {
+    /// Path to the home directory of the Server
+    path: &'static str,
+    /// State of the Server {On, Off, Unknown}
+    state: State,
+    /// Number of Players and their name tags
+    players: Players,
+}
+
+
+impl GeneralBashServer {
+    /// Returns a new Instance of `Server`
+    #[must_use]
+    pub const fn new(path: &'static str) -> Self {
+        Self {
+            path,
+            state: State::Off,
+            players: Players::new(),
+        }
+    }
+}
+
+impl HostableServer for GeneralBashServer {
+    fn start(&mut self) -> Result<(), CommandFailure> {
+        let state = exec_and_parse_command(&format!("sh ./{}/start.sh", self.path));
+
+        if state.is_ok() {
+            self.state = State::On;
+        };
+
+        state
+    }
+
+    fn stop(&mut self) -> Result<(), CommandFailure> {
+        exec_and_parse_command(&format!("sh ./{}/stop.sh", self.path))?;
+
+        self.update_status()
+    }
+
+    fn update_status(&mut self) -> Result<(), CommandFailure> {
+        let sessions = get_screen_sessions();
+
+        if sessions.contains(&format!(".{}_server\t", self.path)) {
+            self.state = State::On;
+        } else {
+            self.state = State::Off;
+        }
+
+        Ok(())
+    }
+
+    fn to_json(&self) -> Result<String, serde_json::Error> {
+        serde_json::to_string(&self)
+    }
+
+    fn get_path(&self) -> &'static str {
+        self.path
     }
 }

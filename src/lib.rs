@@ -83,7 +83,7 @@ impl WebServer {
     ///
     /// web_server.start();
     /// ```
-    pub fn start(&mut self, ip: &'static str, port: usize) {
+    pub fn start(&mut self, ip: &'static str, port: usize) -> ! {
         // timeout setup
         let (tx, timer_thread) = Self::create_timeout_thread(Duration::from_secs(60 * 30));
 
@@ -93,6 +93,7 @@ impl WebServer {
 
         // accepting connections
         for stream in listener.incoming() {
+            // listener.incoming() never returns None, read the docs for more info
             let stream = stream.expect("Never happens");
             self.handle_connection(stream, &tx).unwrap_or_else(|e| {
                 println!("Connection Failed: {e}");
@@ -102,6 +103,11 @@ impl WebServer {
         // IDK if I need this, but I always wanted to use drop somewhere
         // and when I put this here I know timer_thread will live long enough
         drop(timer_thread);
+
+        loop {
+            // Seriously though I the listener.incoming() method never returns None
+            println!("NEVER SHOULD HAVE COME HERE");
+        }
     }
 
     /// Handles the TCP connection

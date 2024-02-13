@@ -2,7 +2,7 @@
 
 use crate::{hostable_servers::get_screen_sessions, HostableServer};
 
-use super::{exec_parse_command, CommandFailure, Players, State};
+use super::{exec_and_parse_command, CommandFailure, GeneralBashServer, Players, State};
 
 /// Arma Server
 #[derive(serde::Serialize)]
@@ -17,17 +17,14 @@ pub struct Server {
 impl Server {
     /// Returns a new Instance of `Server`
     #[must_use]
-    pub const fn new() -> Self {
-        Self {
-            state: State::Off,
-            players: Players::new(),
-        }
+    pub const fn idk() -> GeneralBashServer {
+        GeneralBashServer::new("arma")
     }
 }
 
 impl HostableServer for Server {
     fn start(&mut self) -> Result<(), super::CommandFailure> {
-        let state = exec_parse_command("sh ./arma/start.sh");
+        let state = exec_and_parse_command("sh ./arma/start.sh");
 
         if state.is_ok() {
             self.state = State::On;
@@ -37,10 +34,10 @@ impl HostableServer for Server {
     }
 
     fn stop(&mut self) -> Result<(), super::CommandFailure> {
-        let state = exec_parse_command("sh ./arma/stop.sh");
+        let state = exec_and_parse_command("sh ./arma/stop.sh");
 
         if state.is_ok() {
-            self.state = State::On;
+            self.state = State::Off;
         };
 
         state

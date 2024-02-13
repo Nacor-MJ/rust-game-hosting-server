@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd /home/nacor/web_server/Minecraft
+cd /home/nacor/minecraft
 
 rm screenlog.*
 

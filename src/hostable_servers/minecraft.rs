@@ -1,7 +1,7 @@
 //! Implements [`crate::hostable_servers::HostableServer`] for minecraft
 
 use crate::hostable_servers::{
-    exec_parse_command, get_screen_sessions, CommandFailure, HostableServer,
+    exec_and_parse_command, get_screen_sessions, CommandFailure, HostableServer,
 };
 use serde::Serialize;
 
@@ -43,7 +43,7 @@ impl Server {
     /// # Errors
     /// Returns a [`CommandFailure`] if the program doesn't have the right privilages 
     fn update_players(&mut self) -> Result<(), CommandFailure> {
-        exec_parse_command("sh ./Minecraft/status.sh")?;
+        exec_and_parse_command("sh ./minecraft/status.sh")?;
 
         let output = std::fs::read_to_string("Minecraft/screenlog.0").unwrap_or_else(|e| {
             eprintln!("\x1b[31mCouldn't read the Minecraft log file: {e}\x1b[39m");
@@ -81,7 +81,7 @@ impl HostableServer for Server {
         "minecraft"
     }
     fn start(&mut self) -> Result<(), CommandFailure> {
-        let state = exec_parse_command("sh ./Minecraft/start.sh");
+        let state = exec_and_parse_command("sh ./minecraft/start.sh");
 
         if state.is_ok() {
             self.state = State::Unknown;
@@ -91,7 +91,7 @@ impl HostableServer for Server {
     }
 
     fn stop(&mut self) -> Result<(), CommandFailure> {
-        let state = exec_parse_command("sh ./Minecraft/stop.sh");
+        let state = exec_and_parse_command("sh ./minecraft/stop.sh");
 
         if state.is_ok() {
             self.state = State::Unknown;
