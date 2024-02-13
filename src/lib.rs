@@ -105,7 +105,7 @@ impl WebServer {
         drop(timer_thread);
 
         loop {
-            // Seriously though I the listener.incoming() method never returns None
+            // Seriously though the listener.incoming() method never returns None
             println!("NEVER SHOULD HAVE COME HERE");
         }
     }

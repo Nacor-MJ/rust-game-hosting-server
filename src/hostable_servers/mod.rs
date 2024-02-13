@@ -3,9 +3,6 @@
 use std::process::Command;
 use std::fmt;
 
-pub mod minecraft;
-pub mod arma;
-
 /// Represents a server that can be hosted
 /// 
 /// # Errors
@@ -157,7 +154,7 @@ impl GeneralBashServer {
     pub const fn new(path: &'static str) -> Self {
         Self {
             path,
-            state: State::Off,
+            state: State::new(),
             players: Players::new(),
         }
     }
@@ -168,7 +165,7 @@ impl HostableServer for GeneralBashServer {
         let state = exec_and_parse_command(&format!("sh ./{}/start.sh", self.path));
 
         if state.is_ok() {
-            self.state = State::On;
+            self.state = State::Unknown;
         };
 
         state
