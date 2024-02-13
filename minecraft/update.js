@@ -1,10 +1,10 @@
 async function start_mc() {
-    mc_global_state = true;
     sendPost('/minecraft/start');
+    setTimeout(update_minecraft, 1000);
 }
 async function stop_mc() {
-    mc_global_state = false;
     sendPost('/minecraft/stop');
+    setTimeout(update_minecraft, 1000);
 }
 var mc_global_state = false;
 async function update_minecraft(force_update = false) {

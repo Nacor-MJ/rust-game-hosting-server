@@ -5,6 +5,8 @@ use crate::hostable_servers::{
 };
 use serde::Serialize;
 
+use super::{Players, State};
+
 /// Minecraft Server with the State and number of Players
 #[derive(Serialize)]
 pub struct Server {
@@ -24,11 +26,8 @@ impl Server {
     #[must_use]
     pub const fn new() -> Self {
         Self {
-            state: State::Off,
-            players: Players {
-                count: 0,
-                name_tags: Vec::new(),
-            },
+            state: State::new(),
+            players: Players::new(),
         }
     }
     /// Sets `self` to default
@@ -78,6 +77,9 @@ impl Server {
 }
 
 impl HostableServer for Server {
+    fn get_path(&self) -> &'static str {
+        "minecraft"
+    }
     fn start(&mut self) -> Result<(), CommandFailure> {
         let state = exec_parse_command("sh ./Minecraft/start.sh");
 
@@ -118,22 +120,6 @@ impl HostableServer for Server {
     }
 }
 
-/// Status of a minecraft server
-#[derive(Serialize)]
-enum State {
-    /// Turned On
-    On,
-    /// Turned Off
-    Off,
-    /// Unknown
-    Unknown,
-}
 
-/// Number of players logged into the Server and their nametags
-#[derive(Serialize)]
-struct Players {
-    /// Num of players
-    count: usize,
-    /// Players nametags
-    name_tags: Vec<String>,
-}
+
+

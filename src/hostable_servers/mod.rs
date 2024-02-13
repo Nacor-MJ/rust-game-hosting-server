@@ -1,10 +1,10 @@
 //! Creates an interface for servers that are supposed to be hosted <3
 
-use std::collections::HashMap;
 use std::process::Command;
 use std::fmt;
 
 pub mod minecraft;
+pub mod arma;
 
 /// Represents a server that can be hosted
 /// 
@@ -13,6 +13,11 @@ pub mod minecraft;
 /// This file should have update_{`path_home`} function which is called periodically 
 /// to update the state in the website
 pub trait HostableServer {
+    /// Returns the Path to where the server is stored at
+    /// 
+    /// The folder needs to contain an update.js file that has a update_{path} function 
+    /// to update the client side
+    fn get_path(&self) -> &'static str;
     /// Starts the Server
     /// # Errors
     /// Errors if the start.sh doesn't work. 
@@ -46,13 +51,6 @@ pub trait HostableServer {
     /// or if Self contains a map with non-string keys.
     fn to_json(&self) -> Result<String, serde_json::Error>;
 }
-
-
-/// Hasmap of all the hostable servers
-/// 
-/// The key is the name by which the server will be accesed through the web interface.
-/// The Value needs to implement the  [`HostableServer`] trait
-pub type HostableServerHashed<'a> = HashMap<&'static str,  Box<dyn HostableServer>>;
 
 /// Failure of a [`HostableServer`] command
 pub struct CommandFailure(String);
@@ -97,6 +95,41 @@ fn exec_parse_command(command: &str) -> Result<(), CommandFailure> {
         }
         Err(e) => {
             format!("Error with the screen -list command: \r\n{e:#?}")
+        }
+    }
+}
+
+/// Status of a minecraft server
+#[derive(serde::Serialize)]
+enum State {
+    /// Turned On
+    On,
+    /// Turned Off
+    Off,
+    /// Unknown
+    Unknown,
+}
+impl State {
+    /// Returns a new instance of `State`
+    pub const fn new() -> Self {
+        Self::Off
+    }
+}
+
+/// Number of players logged into the Server and their nametags
+#[derive(serde::Serialize)]
+struct Players {
+    /// Num of players
+    count: usize,
+    /// Players nametags
+    name_tags: Vec<String>,
+}
+impl Players {
+    /// Returns a new instance of `Players`
+    pub const fn new() -> Self {
+        Self {
+            count: 0,
+            name_tags: Vec::new(),
         }
     }
 }
