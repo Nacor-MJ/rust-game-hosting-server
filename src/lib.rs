@@ -39,7 +39,7 @@ impl WebServer {
     /// # Example
     /// Creates and Runs a Server with the `arma` and `minecraft` Interfaces:
     /// ```no_run
-    /// use web_server::{ self, hostable_servers::{arma, minecraft}};
+    /// use web_server::{ self, hostable_servers::GeneralBashServer};
     ///
     /// let mut web_server = web_server::WebServer::new();
     ///
@@ -74,7 +74,7 @@ impl WebServer {
     /// # Example
     /// Creates and Runs a Server with the `arma` and `minecraft` Interfaces:
     /// ```no_run
-    /// use web_server::{ self, hostable_servers::{arma, minecraft}};
+    /// use web_server::{ self, hostable_servers::GeneralBashServer};
     ///
     /// let mut web_server = web_server::WebServer::new();
     ///
