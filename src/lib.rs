@@ -41,12 +41,12 @@ impl WebServer {
     /// ```no_run
     /// use web_server::{ self, hostable_servers::{arma, minecraft}};
     ///
-    /// let mut web_server = web_server::WebServer::new("192.168.11.69", 31415);
+    /// let mut web_server = web_server::WebServer::new();
     ///
-    /// web_server.add_hostable_server(Box::new(minecraft::Server::new()));
-    /// web_server.add_hostable_server(Box::new(arma::Server::new()));
+    /// web_server.add_hostable_server(Box::new(GeneralBashServer::new("minecraft")));
+    /// web_server.add_hostable_server(Box::new(GeneralBashServer::new("arma")));
     ///
-    /// web_server.start();
+    /// web_server.start("192.168.11.69", 31415);
     /// ```
     pub fn add_hostable_server(&mut self, server: Box<dyn HostableServer>) {
         self.hostable_servers.push(server);
@@ -76,12 +76,12 @@ impl WebServer {
     /// ```no_run
     /// use web_server::{ self, hostable_servers::{arma, minecraft}};
     ///
-    /// let mut web_server = web_server::WebServer::new("192.168.11.69", 31415);
+    /// let mut web_server = web_server::WebServer::new();
     ///
-    /// web_server.add_hostable_server(Box::new(minecraft::Server::new()));
-    /// web_server.add_hostable_server(Box::new(arma::Server::new()));
+    /// web_server.add_hostable_server(Box::new(GeneralBashServer::new("minecraft")));
+    /// web_server.add_hostable_server(Box::new(GeneralBashServer::new("arma")));
     ///
-    /// web_server.start();
+    /// web_server.start("192.168.11.69", 31415);
     /// ```
     pub fn start(&mut self, ip: &'static str, port: usize) -> ! {
         // timeout setup
