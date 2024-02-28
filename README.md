@@ -1,4 +1,5 @@
-A home web server host using Rust. Creates a host site at the IP adress and port specified in the config.json. Currently supports one minecraft server. 
+A home web server host using Rust. Creates a host site at the IP adress and port specified. 
 
-Plans:
-In the future there will be a drop down menu that let's the user choose from several server options. The server should shutdown after an hour of inactivity on the website or any of the hosted servers.
+A unique server can be represented with the HostableServerInterface. The update needs some work done.
+
+The server exposes a GeneralBashServer. This is a server controlled by two executables in the path, 'start.sh' and 'stop.sh'. 
