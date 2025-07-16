@@ -35,3 +35,10 @@ async function update_minecraft(force_update = false) {
 }
 
 document.body.innerHTML +='<section id="minecraft-section"><h2>Minecraft Control</h2><button id="start-mc" onclick="start_mc()">Start</button><button id="stop-mc" onclick="stop_mc()">Stop</button><button id="update-mc" onclick="update_minecraft(true)">Update</button><div id="minecraft-status">Status: Off</div></section>'
+
+// =============================================================
+// Rust Game Hosting Server - minecraft/update.js
+// -------------------------------------------------------------
+// STATUS: Project is in limbo and may not work on newer Rust versions.
+// This script updates the Minecraft server status in the web interface.
+// =============================================================

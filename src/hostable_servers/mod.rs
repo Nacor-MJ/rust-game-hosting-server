@@ -1,4 +1,10 @@
+
+//! =============================================================
+//! Rust Game Hosting Server - hostable_servers/mod.rs
+//!
+//! STATUS: Project is in limbo and may not work on newer Rust versions.
 //! Creates an interface for servers that are supposed to be hosted <3
+//! =============================================================
 
 use std::process::Command;
 use std::fmt;

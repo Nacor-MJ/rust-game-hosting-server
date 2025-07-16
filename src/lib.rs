@@ -1,7 +1,14 @@
-//! Simple Rust web server.
 //!
 //! Abstracts away the implementation details of a web server.
 //! Servers that implement the [`HostableServer`] trait can be run on it
+
+//! =============================================================
+//! Rust Game Hosting Server - lib.rs
+//!
+//! STATUS: Project is in limbo and may not work on newer Rust versions.
+//! Abstracts away the implementation details of a web server.
+//! Servers that implement the [`HostableServer`] trait can be run on it
+//! =============================================================
 
 use hostable_servers::HostableServer;
 use http::{Content, Message, Variant};

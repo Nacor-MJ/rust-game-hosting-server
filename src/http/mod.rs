@@ -1,4 +1,10 @@
+
+//! =============================================================
+//! Rust Game Hosting Server - http/mod.rs
+//!
+//! STATUS: Project is in limbo and may not work on newer Rust versions.
 //! Describes all the fun stuff that has something to do with HTTP requests
+//! =============================================================
 
 use std::io;
 

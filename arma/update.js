@@ -35,3 +35,10 @@ async function update_arma(force_update = false) {
 }
 
 document.body.innerHTML +='<section id="arma-section"><h2>Arma Control</h2><button id="start-arma" onclick="start_arma()">Start</button><button id="stop-arma" onclick="stop_arma()">Stop</button><button id="update-arma" onclick="update_arma(true)">Update</button><div id="arma-status">Status: Off</div></section>'
+
+// =============================================================
+// Rust Game Hosting Server - arma/update.js
+// -------------------------------------------------------------
+// STATUS: Project is in limbo and may not work on newer Rust versions.
+// This script updates the Arma server status in the web interface.
+// =============================================================

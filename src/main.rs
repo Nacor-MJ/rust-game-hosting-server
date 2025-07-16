@@ -1,4 +1,10 @@
-//! I don't know what to put here <3
+
+// =============================================================
+// Rust Game Hosting Server - main.rs
+// -------------------------------------------------------------
+// STATUS: Project is in limbo and may not work on newer Rust versions.
+// This file starts the web server and adds hostable game servers.
+// =============================================================
 
 use web_server::{
     self,

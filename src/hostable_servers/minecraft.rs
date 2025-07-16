@@ -1,4 +1,10 @@
+
+//! =============================================================
+//! Rust Game Hosting Server - hostable_servers/minecraft.rs
+//!
+//! STATUS: Project is in limbo and may not work on newer Rust versions.
 //! Implements [`crate::hostable_servers::HostableServer`] for minecraft
+//! =============================================================
 
 use crate::hostable_servers::{
     exec_and_parse_command, get_screen_sessions, CommandFailure, HostableServer,
