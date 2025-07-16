@@ -21,9 +21,9 @@ async function update_minecraft(force_update = false) {
     var mc_new_status = "Status: " + mc_status.state;
     if (mc_status.state == "On") {
         mc_global_state = true;
-        mc_new_status +=  ", Player count: " + mc_status.players.count;
+        mc_new_status += ", Player count: " + mc_status.players.count;
         if (mc_status.players.name_tags.length > 0) {
-            mc_new_status +=  ", Player nametags: " + mc_status.players.name_tags;
+            mc_new_status += ", Player nametags: " + mc_status.players.name_tags;
         }
     } else {
         mc_global_state = false;
@@ -34,7 +34,7 @@ async function update_minecraft(force_update = false) {
     minecraft_status_div.innerHTML = mc_new_status;
 }
 
-document.body.innerHTML +='<section id="minecraft-section"><h2>Minecraft Control</h2><button id="start-mc" onclick="start_mc()">Start</button><button id="stop-mc" onclick="stop_mc()">Stop</button><button id="update-mc" onclick="update_minecraft(true)">Update</button><div id="minecraft-status">Status: Off</div></section>'
+document.body.innerHTML += '<section id="minecraft-section"><h2>Minecraft Control</h2><button id="start-mc" onclick="start_mc()">Start</button><button id="stop-mc" onclick="stop_mc()">Stop</button><button id="update-mc" onclick="update_minecraft(true)">Update</button><div id="minecraft-status">Status: Off</div></section>'
 
 // =============================================================
 // Rust Game Hosting Server - minecraft/update.js

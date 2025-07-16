@@ -1,4 +1,3 @@
-
 //! =============================================================
 //! Rust Game Hosting Server - hostable_servers/minecraft.rs
 //!
@@ -45,9 +44,9 @@ impl Server {
         };
     }
     /// Updates self
-    /// 
+    ///
     /// # Errors
-    /// Returns a [`CommandFailure`] if the program doesn't have the right privilages 
+    /// Returns a [`CommandFailure`] if the program doesn't have the right privilages
     fn update_players(&mut self) -> Result<(), CommandFailure> {
         exec_and_parse_command("sh ./minecraft/status.sh")?;
 
@@ -125,7 +124,3 @@ impl HostableServer for Server {
         serde_json::to_string(&self)
     }
 }
-
-
-
-

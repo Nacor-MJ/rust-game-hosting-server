@@ -60,7 +60,7 @@ impl WebServer {
     }
 
     /// Returns a tcp listener with the set IP Adress and port
-    /// 
+    ///
     /// # Pancis
     /// Panics if the `port` is used or blocker
     fn get_tcp_listener(ip: &'static str, port: usize) -> TcpListener {
@@ -392,7 +392,7 @@ impl WebServer {
     fn shutdown() -> Message {
         Message::new(
             Variant::ServiceUnavailable,
-            Content::Text("Shutting downt isn't supported in this platform yet"),
+            Content::Text("Shutting downt isn't supported in this platform yet".to_string()),
         )
     }
 

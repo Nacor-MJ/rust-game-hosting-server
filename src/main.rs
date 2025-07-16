@@ -1,15 +1,11 @@
+//! =============================================================
+//! Rust Game Hosting Server - main.rs
+//! -------------------------------------------------------------
+//! STATUS: Project is in limbo and may not work on newer Rust versions.
+//! This file starts the web server and adds hostable game servers.
+//! =============================================================
 
-// =============================================================
-// Rust Game Hosting Server - main.rs
-// -------------------------------------------------------------
-// STATUS: Project is in limbo and may not work on newer Rust versions.
-// This file starts the web server and adds hostable game servers.
-// =============================================================
-
-use web_server::{
-    self,
-    hostable_servers::GeneralBashServer,
-};
+use web_server::{self, hostable_servers::GeneralBashServer};
 
 fn main() {
     let mut web_server = web_server::WebServer::new();
